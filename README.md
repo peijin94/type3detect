@@ -18,7 +18,8 @@ Use the Hough transform to recognize the time and frequency range of the Type II
 ### Identify the backbone
 
 Take the result of the Hough transform as a initail position and iteratively move the line to find the backbone position.
-
+![](https://github.com/Pjer-zhang/TypeIIIRadioBurstRecognition/blob/master/img/activecontour.GIF)
+Eventually, we can obtain the centerline of a Type III radio burst.
 
 
 ## Citation
