@@ -25,7 +25,7 @@ Eventually, we can obtain the centerline of a Type III radio burst.
 
 
 ## Citation
-Make sure to cite the paper : [A type III radio burst automatic analysis system and statistic results for a half solar cycle with Nançay Decameter Array data](https://www.aanda.org/component/article?access=doi&doi=10.1051/0004-6361/201833260#R16) Peijin Zhang. A&A 2018.10
+Make sure to cite the paper if you use the idea or code in this repo: [A type III radio burst automatic analysis system and statistic results for a half solar cycle with Nançay Decameter Array data](https://www.aanda.org/component/article?access=doi&doi=10.1051/0004-6361/201833260#R16) Peijin Zhang. A&A 2018.10
 
 bibtex:
 ```
