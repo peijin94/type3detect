@@ -3,21 +3,21 @@ The automatic recognition of the Type III radio burst using Hough Transform and 
 
 ## Method
 
-### Read data
+### Read and preprocess the data
 
-The nancay data is in the form of binary, we developed a Matlab data driver to read in the data.
+The nancay data is in the form of binary, we developed a Matlab data driver to read in the data. And use the code 'constback\_sub.m' to remove the long-term background
 
 ### Binarization
 
-Use several ways to transform the flux intensity data into binary.
+Use several ways to transform the flux intensity data into binary. (get\_local\_max\_map.m)
 
 ### Recognition
 
-Use the Hough transform to recognize the time and frequency range of the Type III radio burst
+Use the Hough transform to recognize the time and frequency range of the Type III radio burst (proc\_event.m)
 
 ### Identify the backbone
 
-Take the result of the Hough transform as a initail position and iteratively move the line to find the backbone position.
+Take the result of the Hough transform as a initail position and iteratively move the line to find the backbone position. The demo code : active\_contour.m
 ![](https://github.com/Pjer-zhang/TypeIIIRadioBurstRecognition/blob/master/img/activecontour.GIF)
 Eventually, we can obtain the centerline of a Type III radio burst.
 
