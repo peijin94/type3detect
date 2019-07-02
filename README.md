@@ -15,7 +15,9 @@ Use several ways to transform the flux intensity data into binary. (get\_local\_
 
 Use the Hough transform to recognize the time and frequency range of the Type III radio burst (proc\_event.m)
 
-### Identify the backbone
+### Identify the backbone 
+
+The Active Contour Method for the backbone of the radio burst (**ACBone**)
 
 Take the result of the Hough transform as a initail position and iteratively move the line to find the backbone position. The demo code : active\_contour.m
 
