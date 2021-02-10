@@ -20,7 +20,7 @@ Use the Hough transform to recognize the time and frequency range of the Type II
 
 The Active Contour Method for the backbone of the radio burst (**ACBone**)
 
-Take the result of the Hough transform as a initail position and iteratively move the line to find the backbone position. The demo code : ([active_contour.m](src/matlab/active_contour.m))
+Take the result of the Hough transform as a initail position and iteratively move the line to find the backbone position. The demo code : ([ACBone-Matlab](src/matlab/active_contour.m), [ACBone-Python](src/python/ACBone.py))
 
 ![img](img/activecontour.GIF)
 
