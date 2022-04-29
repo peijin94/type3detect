@@ -26,6 +26,10 @@ Take the result of the Hough transform as a initail position and iteratively mov
 
 Eventually, we can obtain the centerline of a Type III radio burst.
 
+Update: Python implementation with for LOFAR, (src/python)
+
+![img](img/LOFAR_20220413_135000_LBA_OUTER.fits.jpg)
+
 ## Citation
 
 Make sure to cite the paper if you use the idea or code in this repo: [A type III radio burst automatic analysis system and statistic results for a half solar cycle with Nançay Decameter Array data](https://www.aanda.org/component/article?access=doi&doi=10.1051/0004-6361/201833260#R16) Peijin Zhang. A&A 2018.10
