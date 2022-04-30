@@ -1,4 +1,11 @@
-# useful tools in solar radio physics
+'''
+    File name: radioTools.py
+    Author: Peijin Zhang 张沛锦
+    Date : 2022-4-26
+    
+    handy tools to convert amoung frequency density heliocentric distance
+'''
+
 
 import numpy as np
 import math

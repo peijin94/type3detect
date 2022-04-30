@@ -1,5 +1,11 @@
-# some useful functions to detect solar radio bursts
-# 自动识别射电暴程序
+'''
+    File name: detectRadioburst.py
+    Author: Peijin Zhang 张沛锦
+    Date : 2022-4-30
+    
+    # some useful functions to detect solar radio bursts
+    # 自动识别射电暴程序
+'''
 
 import sys
 sys.path.insert(1, '../') # make sure to use the code in this repo
