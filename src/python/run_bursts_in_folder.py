@@ -26,6 +26,9 @@ import detectRadioburst as drb
 folder_of_interest = './L857852_SAP000_B000_S0_P000_bf/'
 out_folder = './detect/'
 plot_fig = True
+dump_info_to_json = True
+write_csv = True
+
 
 import radioTools as rt
 import glob
@@ -34,8 +37,18 @@ import os
 
 fnames = glob.glob(folder_of_interest+'/*.fits')
 
+import os
+csv_fname = 'event.csv'
+os.system('rm '+csv_fname)
+id_event  = 0
+with open(csv_fname,'w') as fp:
+    fp.write('''ID, t, t0_num, t1_num,f_0,f_1, dfdt(MHz/s), v_b(c)
+             ''')
+fp.close()
 
-for fname in fnames:
+from tqdm import tqdm
+
+for fname in tqdm(fnames):
     # read in 
     (dyspec,t_fits,f_fits,hdu)  = drb.read_fits(fname)
     (dyspec,f_fits) =  drb.cut_low(dyspec,f_fits,f_low_cut_val=25)
@@ -49,7 +62,7 @@ for fname in fnames:
         continue
     line_sets = drb.line_grouping(lines)
     (v_beam, f_range_burst, t_range_burst, model_curve_set,
-         t_set_arr,f_set_arr,t_model_arr,f_model_arr
+         t_set_arr_set,f_set_arr_set,t_model_arr,f_model_arr
         )= drb.get_info_from_linegroup(line_sets,t_fits,f_fits)
 
     fname_json  = fname.replace('.fits','.json')
@@ -81,3 +94,20 @@ for fname in fnames:
         ax.set_title(hdu[0].header['CONTENT'])
         
         fig.savefig(out_folder+os.path.basename(fname)+'.jpg')
+        
+    if write_csv==True:
+        with open(csv_fname,'a') as fp:
+
+            for idx,v_cur in enumerate(v_beam):
+                fp.write(str(id_event)+','+mdates.num2date(t_range_burst[idx][0]).strftime("%H:%M:%S")+','
+                     +str(t_range_burst[idx][0])+','+str(t_range_burst[idx][1])+','
+                     +str(f_range_burst[idx][0])+','+str(f_range_burst[idx][1])+','
+                     +str((np.max(f_set_arr_set[idx])-np.min(f_set_arr_set[idx]))/
+                     (np.max(t_set_arr_set[idx])-np.min(t_set_arr_set[idx])))+','
+                     +str(v_beam[idx])
+                     +'''
+                     ''')
+                id_event+=1
+        fp.close()
+        
+        

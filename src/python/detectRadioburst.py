@@ -102,6 +102,8 @@ def get_info_from_linegroup(line_sets,t_fits,f_fits):
     f_range_burst = []
     t_range_burst = []
     model_curve_set = []
+    t_set_arr_set = []
+    f_set_arr_set = []
     t_set_arr = []
     f_set_arr = []
     t_model_arr = []
@@ -137,12 +139,14 @@ def get_info_from_linegroup(line_sets,t_fits,f_fits):
                                    rt.freq_drift_t_f(np.max(f_set_arr),*popt)[0]/(24*3600)+np.min(t_fits) ] )
             f_range_burst.append([np.min(f_set_arr),np.max(f_set_arr)])
             v_beam.append(popt[0])
+            t_set_arr_set.append(t_set_arr)
+            f_set_arr_set.append(f_set_arr)
         except:
             pass
 
     
     return (v_beam, f_range_burst, t_range_burst, model_curve_set,
-            t_set_arr,f_set_arr,
+            t_set_arr_set,f_set_arr_set,
            t_model_arr,f_model_arr)
 
 def append_into_json(old_json, v_beam, f_range_burst, t_range_burst):

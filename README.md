@@ -16,6 +16,11 @@ Use several ways to transform the flux intensity data into binary. ([LocalMax](s
 
 Use the Hough transform to recognize the time and frequency range of the Type III radio burst ([ProcEvent](src/matlab/proc_event.m))
 
+Update: Python implementation with for LOFAR, (src/python)
+
+![img](img/LOFAR_20220413_135000_LBA_OUTER.fits.jpg)
+
+
 ### Identify the backbone
 
 The Active Contour Method for the backbone of the radio burst (**ACBone**)
@@ -26,9 +31,6 @@ Take the result of the Hough transform as a initail position and iteratively mov
 
 Eventually, we can obtain the centerline of a Type III radio burst.
 
-Update: Python implementation with for LOFAR, (src/python)
-
-![img](img/LOFAR_20220413_135000_LBA_OUTER.fits.jpg)
 
 ## Citation
 
