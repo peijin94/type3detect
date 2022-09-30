@@ -1,6 +1,6 @@
-# Type III Radio Burst Recognition
+# Type III Radio Burst Automatic Recognition Algorithm
 
-The automatic recognition of the Type III radio burst using Hough Transform and idea of active contour.
+The automatic recognition of the Type III radio burst using Hough Transform.
 
 ## Method
 
@@ -10,7 +10,7 @@ The nancay data is in the form of binary, we developed a Matlab data driver to r
 
 ### Binarization
 
-Use several ways to transform the flux intensity data into binary. ([LocalMax](src/matlab/get_local_max_map.m))
+Use several ways to transform the flux intensity data into binary. ([LocalMax(matlab)](src/matlab/get_local_max_map.m)) ([LocalMax(Python)](src/python/detectRadioBurst.py))
 
 ### Recognition
 

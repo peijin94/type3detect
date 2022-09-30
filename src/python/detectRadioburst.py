@@ -58,6 +58,7 @@ def preproc(dyspec,gauss_sigma=1.5):
     return (data_fits_new_tmp,data_fits_new)
     
 def binarization(data_fits_new,N_order=6,peak_r=0.99):
+    # with high order local-max method 
     bmap = np.ones_like(data_fits_new)
     N_pad = N_order
     local_max_arr = np.pad(data_fits_new,((N_pad,N_pad),(0,0)))
