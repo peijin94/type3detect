@@ -8,7 +8,7 @@ def PJcurvature(x,y):
     """
     input  : the coordinate of the three point
     output : the curvature and norm direction
-    refer to https://github.com/Pjer-zhang/PJCurvature for detail
+    refer to https://github.com/peijin94/PJCurvature for detail
     """
     t_a = LA.norm([x[1]-x[0],y[1]-y[0]])
     t_b = LA.norm([x[2]-x[1],y[2]-y[1]])

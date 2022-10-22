@@ -9,11 +9,9 @@
 import sys
 
 import matplotlib.dates as mdates
-import datetime
 import matplotlib.pyplot as plt
 import numpy as np
-import astropy.io.fits as fits
-import scipy
+from skimage.transform import probabilistic_hough_line
 
 import matplotlib as mpl
 # try to use the precise epoch
@@ -22,12 +20,8 @@ try:
     mdates.set_epoch('1970-01-01T00:00:00')
 except:
     pass
-import detectRadioburst as drb
 
-from skimage.transform import probabilistic_hough_line
-
-import detectRadioburst as drb
-
+from type3detect import detectRadioburst as drb
 
 folders_of_interest = ['./L857852_SAP000_B000_S0_P000_bf/']
 # folders_of_interest = glob.glob('L857852*')
@@ -37,7 +31,7 @@ dump_info_to_json = True
 write_csv = True
 
 
-import radioTools as rt
+from type3detect import radioTools as rt
 import glob
 import json
 import os

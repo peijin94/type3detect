@@ -24,7 +24,7 @@ try:
     mdates.set_epoch('1970-01-01T00:00:00')
 except:
     pass
-import radioTools as rt
+from . import radioTools as rt
 from skimage.transform import probabilistic_hough_line
 
 # frequency [MHz]
@@ -33,9 +33,9 @@ from skimage.transform import probabilistic_hough_line
 def read_fits(fname):
     
     hdu = fits.open(fname)
-    dyspec = hdu[0].data
-    f_fits = hdu[1].data['FREQ'][:]
-    t_fits = hdu[2].data['TIME'][:]
+    dyspec = np.array(hdu[0].data)
+    f_fits = np.array(hdu[1].data['FREQ'][0])
+    t_fits = np.array(hdu[1].data['TIME'][0])
     return (dyspec,t_fits,f_fits,hdu)
 
 
@@ -50,9 +50,14 @@ def cut_low(dyspec,f_fits,f_low_cut_val=21):
     return (dyspec,f_fits)
     
     
-def preproc(dyspec,gauss_sigma=1.5):
+def preproc(dyspec,gauss_sigma=1.5, background_normalize=True):
     # const background removal and gaussian smooth
-    data_fits_new_tmp = dyspec-np.tile(np.mean(dyspec,0),(dyspec.shape[0],1))    
+    if background_normalize:
+        data_fits_new_tmp = (dyspec / np.nanmean(
+                np.sort(dyspec, 0)[
+                int(dyspec.shape[0] * 0.1):int(dyspec.shape[0] * 0.3), :], 0))-1
+    else:
+        data_fits_new_tmp = dyspec
     data_fits_new  = scipy.ndimage.gaussian_filter(data_fits_new_tmp,
         gauss_sigma, order=0, output=None,  cval=0.0, truncate=5.0,mode='nearest')
     return (data_fits_new_tmp,data_fits_new)
@@ -81,13 +86,13 @@ def point_to_line_distance(p1,p2,p3):
     d = np.abs(norm(np.cross(p2-p1, p1-p3)))/norm(p2-p1)
     return d
 
-def line_grouping(lines):
+def line_grouping(lines,min_dist=3): # pix
     # group the detected lines into group in regard of events
     lines = sorted(lines, key=lambda i: i[0][1])
     line_sets = [[lines[0]]]
     for idx,line in enumerate(lines[0:-1]):
         (A,B),(C,D) = np.array([lines[idx], lines[idx+1] ])
-        if np.min([point_to_line_distance(A,B,C),point_to_line_distance(A,B,D)])< 2.5:
+        if np.min([point_to_line_distance(A,B,C),point_to_line_distance(A,B,D)])< 3:
             line_sets[len(line_sets)-1].append(lines[idx+1])
         else:
             line_sets.append([lines[idx+1]])
@@ -98,7 +103,7 @@ def line_grouping(lines):
 from scipy import interpolate,optimize
 
 def get_info_from_linegroup(line_sets,t_fits,f_fits):
-    
+
     # mapping from t and f to index of x and y
     t_idx_arr = np.arange(0, t_fits.shape[0])
     f_idx_arr = np.arange(0, f_fits.shape[0])
