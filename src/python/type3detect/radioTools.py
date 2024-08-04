@@ -53,7 +53,7 @@ def freq_to_R(f_pe, ne_r = parkerfit):
     Starting height for wave frequency f
     """
     func  = lambda R : f_pe - (omega_pe_r(ne_r,R)) /2/np.pi
-    R_solution = fsolver(func, 1.5) # solve the R
+    R_solution = fsolver(func, 1.1) # solve the R
     return R_solution # [R_s]
 
 
@@ -80,12 +80,12 @@ def freq_drift_f_t(t,v,t0,dm = parkerfit ):
 
 
 def freq_drift_t_f(f,v,t0,dm = parkerfit):
-    # t0 is the time at 100MHz
+    # t0 is the time at 300MHz
     # t [day]
     # f [MHz]
     # v [c]
     
     R_new =  freq_to_R(f*1e6, 
                 ne_r = dm)
-    dt = (R_new- freq_to_R(300e6,dm))/v/ c_r
+    dt = (R_new- freq_to_R(300e6,dm))/(v*c_r)
     return t0+dt

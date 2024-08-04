@@ -5,6 +5,10 @@
     
     # some useful functions to detect solar radio bursts
     # 自动识别射电暴程序
+
+    Notes:
+
+    1. input dspec should be in the shape of (time, frequency)
 '''
 
 import sys
@@ -16,6 +20,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import astropy.io.fits as fits
 import scipy
+from scipy import interpolate,optimize
 
 import matplotlib as mpl
 # try to use the precise epoch
@@ -30,8 +35,8 @@ from skimage.transform import probabilistic_hough_line
 # frequency [MHz]
 
 
-def read_fits(fname):
-    
+def read_fits_lofar(fname):
+    # for lofar fits file
     hdu = fits.open(fname)
     dyspec = np.array(hdu[0].data)
     f_fits = np.array(hdu[1].data['FREQ'][0])
@@ -86,21 +91,62 @@ def point_to_line_distance(p1,p2,p3):
     d = np.abs(norm(np.cross(p2-p1, p1-p3)))/norm(p2-p1)
     return d
 
-def line_grouping(lines,min_dist=3): # pix
+def point_to_point_distance(p1,p2):
+    return norm(p1-p2)
+
+def line_grouping(lines,min_dist=3, threshmode=2): # pix
+    """
+    Parameters
+    ----------
+    lines : list
+        list of lines detected by hough transform.
+    min_dist : float, optional  # pix
+        minimum distance between two lines to be grouped together.
+    threshmode : int, optional
+        DESCRIPTION. 1: only distance of point to line
+                        2: distance of point to line and angle between lines
+    """
     # group the detected lines into group in regard of events
-    lines = sorted(lines, key=lambda i: i[0][1])
+
+
+    lines = sorted(lines, key=lambda i: (i[0][1]+i[1][1])/2)
     line_sets = [[lines[0]]]
     for idx,line in enumerate(lines[0:-1]):
         (A,B),(C,D) = np.array([lines[idx], lines[idx+1] ])
-        if np.min([point_to_line_distance(A,B,C),point_to_line_distance(A,B,D)])< 3:
+
+        # use the longer line as the reference
+        l_AB = norm(A-B)
+        l_CD = norm(C-D)
+        if l_AB<l_CD:
+            A,B,C,D = C,D,A,B
+        
+        # point to line distance
+        Line_dist_thresh = np.min([point_to_line_distance(A,B,C),point_to_line_distance(A,B,D)])< min_dist
+        Line_dist_thresh2 = np.min([point_to_line_distance(A,B,C),point_to_line_distance(A,B,D)])< min_dist*1.5
+
+        # two lines segment not too far away
+        Point_dist_thresh = np.min([point_to_point_distance(A,C),point_to_point_distance(A,D),
+                                    point_to_point_distance(B,C),point_to_point_distance(B,D)])< np.max(
+                                        [point_to_point_distance(A,B),point_to_point_distance(C,D)])
+       
+        if threshmode==1:
+            final_thresh = Line_dist_thresh
+        elif threshmode==2:
+            final_thresh = Line_dist_thresh & Point_dist_thresh
+        elif threshmode==3:
+            if B[0]>C[0] and B[1]>C[1]:
+                final_thresh = Line_dist_thresh2 & Point_dist_thresh
+
+        if final_thresh:
+            # the line join
             line_sets[len(line_sets)-1].append(lines[idx+1])
         else:
+            # new set
             line_sets.append([lines[idx+1]])
     
     return line_sets
 
 
-from scipy import interpolate,optimize
 
 def get_info_from_linegroup(line_sets,t_fits,f_fits):
 
