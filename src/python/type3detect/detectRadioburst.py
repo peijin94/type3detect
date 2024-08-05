@@ -22,6 +22,8 @@ import astropy.io.fits as fits
 import scipy
 from scipy import interpolate,optimize
 
+from scipy.optimize import curve_fit
+
 import matplotlib as mpl
 # try to use the precise epoch
 mpl.rcParams['date.epoch']='1970-01-01T00:00:00'
@@ -42,7 +44,6 @@ def read_fits_lofar(fname):
     f_fits = np.array(hdu[1].data['FREQ'][0])
     t_fits = np.array(hdu[1].data['TIME'][0])
     return (dyspec,t_fits,f_fits,hdu)
-
 
 
 def idx_val_pos(f_fits, target):
@@ -107,8 +108,6 @@ def line_grouping(lines,min_dist=3, threshmode=2): # pix
                         2: distance of point to line and angle between lines
     """
     # group the detected lines into group in regard of events
-
-
     lines = sorted(lines, key=lambda i: (i[0][1]+i[1][1])/2)
     line_sets = [[lines[0]]]
     for idx,line in enumerate(lines[0:-1]):
@@ -223,3 +222,90 @@ def append_into_json(old_json, v_beam, f_range_burst, t_range_burst):
         'detail': event_detail}
     
     return old_json
+
+
+def averaging(arr_query, n_point, axis=0, start_idx=-1, end_idx=-1):
+    start_idx = 0 if start_idx < 0 else start_idx
+    end_idx = arr_query.shape[axis] if end_idx < 0 else end_idx
+    out_size = ((end_idx-start_idx) // n_point)
+
+    res = 0
+    if axis == 1:
+        res = np.mean(np.array(([arr_query[:, (start_idx+idx):(start_idx+(out_size)*n_point+idx):n_point]
+                                 for idx in range(n_point)])), axis=0)
+    else:
+        res = np.mean(np.array(([arr_query[(start_idx+idx):(start_idx+(out_size)*n_point+idx):n_point, :]
+                                 for idx in range(n_point)])), axis=0)
+    return res
+
+def model_based_shift_per_ch(data, t_ax, f_ax, vbeam=0.15, model=rt.parkerfit, ops_forward = True):
+    """ 
+    shift the data based on the model curve of type III burst.
+    given a speed of the electron
+    
+    Parameters:
+    -----------
+    data: np.array
+        the data to be shifted, shape: (time, frequency)
+    t_ax: np.array
+        time axis of the data, in mjd
+    f_ax: np.array
+        frequency axis of the data in MHz
+    vbeam: float
+        the speed of the electron beam, in c
+    model: function
+        the model function of the type III burst, default is parkerfit
+    ops_forward: bool
+        if True, shift the data forward, else shift the data backward
+        (forward means from raw spec to shifted spec)
+        (backward means from shifted spec to raw spec)
+    
+    Returns:
+    --------
+    data_aligned: np.array
+        the aligned data, shape: (time, frequency)
+    """
+
+    # assuming 0.2c of beam speed for the channel-wised time shifting alignment
+    delay_ch = np.array([rt.freq_drift_t_f(f_this, vbeam, 0) for f_this in f_ax])
+    dt_raw =  np.mean(np.diff(t_ax))*24*3600 
+    idx_shift = np.round(delay_ch /dt_raw ).astype(int)
+    # align the data
+    data_aligned = np.zeros_like(data)
+
+    for i in range(data.shape[1]):
+        if ops_forward:
+            data_aligned[:,i] = np.roll(data[:,i], -idx_shift[i])
+        else:
+            data_aligned[:,i] = np.roll(data[:,i], idx_shift[i])
+
+    return data_aligned
+
+
+def pix_to_val(pix,arr):
+    """ 
+    Input a number in pixel space, output the value in the original space
+    arr should be monotonically increasing or decreasing
+    """
+
+    if pix<0:
+        return arr[0]
+    elif pix>(arr.shape[0])-1:
+        return arr[-1]
+    else:
+        boundary = [np.floor(pix),np.floor(pix)+1]
+        return (pix-boundary[0])*arr[int(boundary[1])]+(boundary[1]-pix)*arr[int(boundary[0])]
+    
+def val_to_pix(val,arr):
+    """ 
+    Input a number in original space, output the value in the pixel space
+    arr should be monotonically increasing or decreasing
+    """
+    if val<arr[0]:
+        return 0
+    elif val>arr[-1]:
+        return (arr.shape[0])-1
+    else:
+        pix_lower = np.abs(arr-val).argmin()
+        pix_upper = pix_lower+1
+        return pix_lower+(val-arr[pix_lower])/(arr[pix_upper]-arr[pix_lower])
