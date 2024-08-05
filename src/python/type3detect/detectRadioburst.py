@@ -288,12 +288,21 @@ def pix_to_val(pix,arr):
     arr should be monotonically increasing or decreasing
     """
 
+    # if pix is integer, return the value directly
+    if pix==int(pix):
+        return arr[int(pix)]
+    if np.abs(pix-int(pix))<1e-6:
+        return arr[int(pix)]
     if pix<0:
         return arr[0]
     elif pix>(arr.shape[0])-1:
         return arr[-1]
     else:
         boundary = [np.floor(pix),np.floor(pix)+1]
+        if boundary[1]>arr.shape[0]-1:
+            boundary = [arr.shape[0]-2,arr.shape[0]-1]
+        if boundary[0]<0:
+            boundary = [0,1]
         return (pix-boundary[0])*arr[int(boundary[1])]+(boundary[1]-pix)*arr[int(boundary[0])]
     
 def val_to_pix(val,arr):
