@@ -67,7 +67,7 @@ def R_to_freq(R,ne_r = parkerfit):
 
 def freq_drift_f_t(t,v,t0,dm = parkerfit ):
     # t0 is the time at 100MHz
-    # t [day]
+    # t [s]
     # f [MHz]
     # v [c]
     r0 =  freq_to_R(300e6,dm)
@@ -81,7 +81,7 @@ def freq_drift_f_t(t,v,t0,dm = parkerfit ):
 
 def freq_drift_t_f(f,v,t0,dm = parkerfit):
     # t0 is the time at 300MHz
-    # t [day]
+    # t [s]
     # f [MHz]
     # v [c]
     
